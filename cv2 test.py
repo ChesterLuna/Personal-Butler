@@ -9,30 +9,48 @@ from matplotlib.image import imread
 CC_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
 
 # following https://medium.com/@siucy814/training-a-facial-recognition-model-by-opencv-e4717d86b7ec
-path = "YOUR PATH"
+current_path = os.getcwd()
+path = current_path + "\\recognized_faces"
+
+labels = os.listdir(path)
+
+name = {}
+
+
 
 def getImagesAndLabels(path):
-    imagePaths = [os.path.join(path,f) for f in os.listdir(path)] 
     faceSamples=[]
     ids = []
-    for imagePath in imagePaths:
-        PIL_img = Image.open(imagePath).convert('L') #Luminance  ==> greystyle
-        img_numpy = np.array(PIL_img,'uint8')
-        #print(PIL_img)
-        #.show()
-        #print(len(img_numpy)
-        id = 1 #int(os.path.split(imagePath)[-1].split(".")[0]) SHOULD BE CHANGED TODO
-        faces = CC_classifier.detectMultiScale(img_numpy)
-        #print(id)
-        #print(faces)
-        if len(faces) > 1:
-            print("The following image detect more than 1 face", imagePath)
-        for (x,y,w,h) in faces:
-            faceSamples.append(img_numpy[y:y+h,x:x+w])
-            ids.append(id)
-            #print(ids)
+    
+    # folderPaths = [os.path.join(path, label) for label in labels]
+    folders = labels
+
+    n = 0
+    for folder in folders:
+        n += 1
+        folderPath = os.path.join(path, folder)
+        name[n] = folder
+
+        imagePaths = [os.path.join(folderPath,f) for f in os.listdir(folderPath)]
+        for imagePath in imagePaths:
+            PIL_img = Image.open(imagePath).convert('L') #Luminance  ==> greystyle
+            img_numpy = np.array(PIL_img,'uint8')
+            #print(PIL_img)
+            #.show()
+            #print(len(img_numpy)
+            id = n
+            faces = CC_classifier.detectMultiScale(img_numpy)
+            #print(id)
+            # print(faces)
+            if len(faces) > 1:
+                print("The following image detect more than 1 face", imagePath)
+            for (x,y,w,h) in faces:
+                faceSamples.append(img_numpy[y:y+h,x:x+w])
+                ids.append(id)
+                #print(ids)
             
     return faceSamples,ids
+
 faces,ids = getImagesAndLabels(path)
 
 
@@ -59,7 +77,8 @@ facerecognizer = train_classifier(faces, ids)
 
 def main():
 
-    name = {1:"Ches"} # Will have more people TODO
+    # name = {} # Will have more people TODO
+    # name = setNames()
 
     # Following tut: https://www.datacamp.com/tutorial/face-detection-python-opencv
 
@@ -83,10 +102,10 @@ def main():
             # print("confidence:", confidence)
             # print("label:", label)
             
-            predicted_name = name[label]            
+            predicted_name = name[label]
             # gray = cv2.cvtColor(gray,cv2.COLOR_BGR2RGB)
 
-            labelFace(face, video_frame, name[label], str(confidence))
+            labelFace(face, video_frame, predicted_name, str(confidence))
         cv2.imshow("A Butler should know your face", video_frame) 
 
         if cv2.waitKey(1) & 0xFF == ord("e"):
