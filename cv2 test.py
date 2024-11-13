@@ -3,7 +3,6 @@ import os
 from PIL import Image, ImageDraw
 import numpy as np
 from matplotlib import pyplot as plt
-from matplotlib.image import imread
 
 # WIP I would like this to recognize me and my friends so I would like to see if works for them.
 CC_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
@@ -16,7 +15,7 @@ labels = os.listdir(path)
 
 name = {}
 
-
+confidence_level = 50
 
 def getImagesAndLabels(path):
     faceSamples=[]
@@ -77,9 +76,6 @@ facerecognizer = train_classifier(faces, ids)
 
 def main():
 
-    # name = {} # Will have more people TODO
-    # name = setNames()
-
     # Following tut: https://www.datacamp.com/tutorial/face-detection-python-opencv
 
     # Get the video
@@ -105,7 +101,7 @@ def main():
             predicted_name = name[label]
             # gray = cv2.cvtColor(gray,cv2.COLOR_BGR2RGB)
 
-            labelFace(face, video_frame, predicted_name, str(confidence))
+            setBoundingBox(face, video_frame, predicted_name, confidence)
         cv2.imshow("A Butler should know your face", video_frame) 
 
         if cv2.waitKey(1) & 0xFF == ord("e"):
@@ -114,7 +110,7 @@ def main():
     video_stream.release()
     cv2.destroyAllWindows()
 
-def labelFace(face, vid, label: str, confidence: str):
+def setBoundingBox(face, vid, label: str, confidence: float):
     (x,y,w,h) = face
     point1 = (x, y)
     point2 = (x + w, y + h)
@@ -124,10 +120,14 @@ def labelFace(face, vid, label: str, confidence: str):
     font_face = cv2.FONT_HERSHEY_SIMPLEX
     scale = 0.4
 
-    text = label + " " + confidence
+    text = label + " " + str(confidence)
 
     cv2.rectangle(vid, point1, point2, color, thickness)
-    cv2.putText(vid, text, (x, y - 5), font_face, scale, color, 1, cv2.LINE_AA)
+
+    if(confidence <= confidence_level):
+        cv2.putText(vid, text, (x, y - 5), font_face, scale, color, 1, cv2.LINE_AA)
+    else:
+        cv2.putText(vid, "Unknown user", (x, y - 5), font_face, scale, color, 1, cv2.LINE_AA)
 
 
 if __name__ == "__main__":
