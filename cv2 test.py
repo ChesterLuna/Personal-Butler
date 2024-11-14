@@ -4,24 +4,35 @@ from PIL import Image, ImageDraw
 import numpy as np
 from matplotlib import pyplot as plt
 
-# WIP I would like this to recognize me and my friends so I would like to see if works for them.
+# The code that makes the Butler recognize the users faces and allows it to greet them and respond to their comands.
+# By Chester A. Perez Luna
+# 
+# Used code snippets from:
+# 
+# https://www.datacamp.com/tutorial/face-detection-python-opencv
+# https://medium.com/@siucy814/training-a-facial-recognition-model-by-opencv-e4717d86b7ec
+
+
+# Makes a classifier that recognizes faces
 CC_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
 
-# following https://medium.com/@siucy814/training-a-facial-recognition-model-by-opencv-e4717d86b7ec
+# Set the path to get the users pictures
 current_path = os.getcwd()
 path = current_path + "\\recognized_faces"
 
+# Get the users names by the name of their respective folder
 labels = os.listdir(path)
-
 name = {}
 
+# How much confidence does the Butler need to know before recognizing a face.
+# The confidence is a measure of how different the face is to the prediction.
+# The smallest the number, the more confident it needs to be of the face.
 confidence_level = 50
 
 def getImagesAndLabels(path):
     faceSamples=[]
     ids = []
     
-    # folderPaths = [os.path.join(path, label) for label in labels]
     folders = labels
 
     n = 0
@@ -76,8 +87,6 @@ facerecognizer = train_classifier(faces, ids)
 
 def main():
 
-    # Following tut: https://www.datacamp.com/tutorial/face-detection-python-opencv
-
     # Get the video
     video_stream = cv2.VideoCapture(0)
 
@@ -122,8 +131,10 @@ def setBoundingBox(face, vid, label: str, confidence: float):
 
     text = label + " " + str(confidence)
 
+    # Add bounding box around face
     cv2.rectangle(vid, point1, point2, color, thickness)
 
+    # Add label to face
     if(confidence <= confidence_level):
         cv2.putText(vid, text, (x, y - 5), font_face, scale, color, 1, cv2.LINE_AA)
     else:
