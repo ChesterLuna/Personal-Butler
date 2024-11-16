@@ -10,7 +10,7 @@ thingsToSay = deque()
 currentUser = "Test User"
 
 def say(phrase):
-    engine.say(thingsToSay.pop())
+    engine.say(phrase)
     engine.runAndWait()
 
 def greet(userName):
