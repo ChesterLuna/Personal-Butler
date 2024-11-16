@@ -1,5 +1,6 @@
 import pyttsx3
 from collections import deque
+from datetime import datetime
 
 # The speech module of the Butler. Allows it to say things outloud and greet people.
 
@@ -20,8 +21,17 @@ def greet(userName):
     engine.runAndWait()
 
 def checkTimeOfDay():
-    # TODO Should be either: Morning, Day, Afternoon, Evening.
-    return "Day"
+    time = datetime.now()
+    hour = int(time.strftime("%H"))
+    stageOfDay ="day"
+    if(hour > 6 and hour <=11):
+        stageOfDay = "morning"
+    elif (hour > 11 and hour <=18):
+        stageOfDay = "afternoon"
+    elif ((hour > 18 and hour <=24) or (hour > 00 and hour <=6) ):
+        stageOfDay = "evening"
+
+    return stageOfDay
 
 def main():
     while True:        
