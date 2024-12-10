@@ -4,40 +4,38 @@ from datetime import datetime
 
 # The speech module of the Butler. Allows it to say things outloud and greet people.
 
-engine = pyttsx3.init()
+class Speaker:
 
-thingsToSay = deque()
-currentUser = "Test User"
+    def __init__(self):
+        self.engine = pyttsx3.init()
+        self.thingsToSay = deque()
+        # self.currentUser = "Test User"
+    
+    def sayEverythingInQueue(self):
+        while self.thingsToSay:       
+            self.say(self.thingsToSay.pop())
 
-def say(phrase):
-    engine.say(phrase)
-    engine.runAndWait()
 
-def greet(userName):
-    timeOfDay = checkTimeOfDay()
-    engine.say("Good " + timeOfDay + " " + userName)
-    engine.say("How is your day going?")
-    engine.say("Hold that thought, I still can't answer.")
-    engine.runAndWait()
+    def say(self, phrase):
+        self.engine.say(phrase)
+        self.engine.runAndWait()
 
-def checkTimeOfDay():
-    time = datetime.now()
-    hour = int(time.strftime("%H"))
-    stageOfDay ="day"
-    if(hour > 6 and hour <=11):
-        stageOfDay = "morning"
-    elif (hour > 11 and hour <=18):
-        stageOfDay = "afternoon"
-    elif ((hour > 18 and hour <=24) or (hour > 00 and hour <=6) ):
-        stageOfDay = "evening"
+    def greet(self, userName):
+        timeOfDay = self.checkTimeOfDay()
+        self.engine.say("Good " + timeOfDay + " " + userName)
+        self.engine.say("How is your day going?")
+        self.engine.say("Hold that thought, I still can't answer.")
+        self.engine.runAndWait()
 
-    return stageOfDay
+    def checkTimeOfDay(self):
+        time = datetime.now()
+        hour = int(time.strftime("%H"))
+        stageOfDay ="day"
+        if(hour > 6 and hour <=11):
+            stageOfDay = "morning"
+        elif (hour > 11 and hour <=18):
+            stageOfDay = "afternoon"
+        elif ((hour > 18 and hour <=24) or (hour > 00 and hour <=6) ):
+            stageOfDay = "evening"
 
-def main():
-    while True:        
-        if (len(thingsToSay)):
-            say(thingsToSay.pop())
-        
-
-if __name__ == "__main__":
-    main()
+        return stageOfDay
