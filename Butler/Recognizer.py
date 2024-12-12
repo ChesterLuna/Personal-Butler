@@ -127,7 +127,7 @@ class Recognizer:
 
 
     def show_bounded_faces(self, video_frame, faces, gray_image):
-        detected_names = self.set_bounded_faces(faces, gray_image)
+        detected_names = self.set_bounded_faces(video_frame, faces, gray_image)
         cv2.imshow("A Butler should know your face", video_frame)
         return detected_names
 
@@ -137,7 +137,7 @@ class Recognizer:
         faces, gray_image = self.detect_bounding_box(video_frame)
         return video_frame,faces,gray_image
 
-    def set_bounded_faces(self, faces, gray_image):
+    def set_bounded_faces(self, video_frame, faces, gray_image):
         detected_names = []
 
         for face in faces:
@@ -149,15 +149,15 @@ class Recognizer:
             # gray = cv2.cvtColor(gray,cv2.COLOR_BGR2RGB)
 
             if(confidence <= self.confidence_level):
-                self.setBoundingBox(face, predicted_name, confidence)
+                self.setBoundingBox(video_frame, face, predicted_name, confidence)
                 detected_names.append(predicted_name)
             else:
-                self.setDefaultBoundingBox(face, predicted_name, confidence)
+                self.setDefaultBoundingBox(video_frame, face, predicted_name, confidence)
         return detected_names
 
 
 
-    def setBoundingBox(self, face, label: str, confidence: float):
+    def setBoundingBox(self, vid, face, label: str, confidence: float):
         (x,y,w,h) = face
         point1 = (x, y)
         point2 = (x + w, y + h)
@@ -170,12 +170,12 @@ class Recognizer:
         text = label + " " + str(confidence)
 
         # Add bounding box around face
-        cv2.rectangle(self.video_stream, point1, point2, color, thickness)
+        cv2.rectangle(vid, point1, point2, color, thickness)
 
         # Add label to face
-        cv2.putText(self.video_stream, text, (x, y - 5), font_face, scale, color, 1, cv2.LINE_AA)
+        cv2.putText(vid, text, (x, y - 5), font_face, scale, color, 1, cv2.LINE_AA)
 
-    def setDefaultBoundingBox(self, face, label: str, confidence: float):
+    def setDefaultBoundingBox(self, vid, face, label: str, confidence: float):
         (x,y,w,h) = face
         point1 = (x, y)
         point2 = (x + w, y + h)
@@ -188,9 +188,9 @@ class Recognizer:
         text = label + " " + str(confidence)
 
         # Add bounding box around face
-        cv2.rectangle(self.video_stream, point1, point2, color, thickness)
+        cv2.rectangle(vid, point1, point2, color, thickness)
 
-        cv2.putText(self.video_stream, "Unknown user", (x, y - 5), font_face, scale, color, 1, cv2.LINE_AA)
+        cv2.putText(vid, "Unknown user", (x, y - 5), font_face, scale, color, 1, cv2.LINE_AA)
 
 
     # if __name__ == "__main__":
