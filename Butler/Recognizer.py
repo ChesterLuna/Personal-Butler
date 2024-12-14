@@ -123,10 +123,10 @@ class Recognizer:
 
         if cv2.waitKey(1) & 0xFF == ord("e"):
             return False, None, None
-        return detected_names, None, None
+        return detected_names, detected_names, None
 
 
-    def show_bounded_faces(self, video_frame, faces, gray_image):
+    def show_bounded_faces(self, video_frame, faces, gray_image) -> list:
         detected_names = self.set_bounded_faces(video_frame, faces, gray_image)
         cv2.imshow("A Butler should know your face", video_frame)
         return detected_names
@@ -137,7 +137,7 @@ class Recognizer:
         faces, gray_image = self.detect_bounding_box(video_frame)
         return video_frame,faces,gray_image
 
-    def set_bounded_faces(self, video_frame, faces, gray_image):
+    def set_bounded_faces(self, video_frame, faces, gray_image) -> list:
         detected_names = []
 
         for face in faces:

@@ -15,7 +15,8 @@ def main():
         if(faceFiles is False):
             break
 
-        speaker.greet(name)
+        if(len(faceFiles) != 0):
+            speaker.greet(name[0])
     recognizer.stop_recognizer
 
 
