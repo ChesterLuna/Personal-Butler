@@ -5,6 +5,7 @@ def main():
     # Receive information from Recognizer
     # If a face is found, label it and return the name
     # Use the Speech to greet the person using the label
+    peopleGreeted = []
     faceFiles = None
     speaker = Speech.Speaker()
     recognizer = rn.Recognizer()
@@ -16,7 +17,9 @@ def main():
             break
 
         if(len(faceFiles) != 0):
-            speaker.greet(name[0])
+            if(name[0] not in peopleGreeted):
+                speaker.greet(name[0])
+                peopleGreeted.append(name[0])
     recognizer.stop_recognizer
 
 
