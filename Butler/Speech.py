@@ -1,7 +1,7 @@
 import pyttsx3
 from collections import deque
 from datetime import datetime
-
+import threading
 # The speech module of the Butler. Allows it to say things outloud and greet people.
 
 class Speaker:
@@ -18,14 +18,16 @@ class Speaker:
 
     def say(self, phrase):
         self.engine.say(phrase)
-        self.engine.runAndWait()
+        threading.Thread(target=self.engine.runAndWait).start()
 
     def greet(self, userName):
         timeOfDay = self.checkTimeOfDay()
         self.engine.say("Good " + timeOfDay + " " + userName)
         self.engine.say("How is your day going?")
         self.engine.say("Hold that thought, I still can't answer.")
-        self.engine.runAndWait()
+        threading.Thread(target=self.engine.runAndWait).start()
+
+        # self.engine.runAndWait()
 
     def checkTimeOfDay(self):
         time = datetime.now()
