@@ -68,12 +68,12 @@ class Recognizer:
                 #.show()
                 #print(len(img_numpy)
                 id = n
-                faces = self.CC_classifier.detectMultiScale(img_numpy)
+                faces = self.CC_classifier.detectMultiScale2(img_numpy)
                 #print(id)
                 # print(faces)
-                if len(faces) > 1:
+                if len(faces[0]) > 1:
                     print("The following image detect more than 1 face", imagePath)
-                for (x,y,w,h) in faces:
+                for (x,y,w,h) in faces[0]:
                     faceSamples.append(img_numpy[y:y+h,x:x+w])
                     ids.append(id)
                     #print(ids)
