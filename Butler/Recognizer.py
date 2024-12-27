@@ -13,7 +13,7 @@ from matplotlib import pyplot as plt
 # https://medium.com/@siucy814/training-a-facial-recognition-model-by-opencv-e4717d86b7ec
 
 class Recognizer:
-    def __init__(self, confidence_level = 50):
+    def __init__(self, confidence_level = 50, training_CL = 10):
         # Makes a classifier that recognizes faces
         self.CC_classifier = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
 
@@ -29,6 +29,7 @@ class Recognizer:
         # The confidence is a measure of how different the face is to the prediction.
         # The smallest the number, the more confident it needs to be of the face.
         self.confidence_level = confidence_level
+        self.training_CL = training_CL
 
         self.faces, self.ids = self.getImagesAndLabels(self.path)
         self.face_recognizer=cv2.face.LBPHFaceRecognizer_create()
@@ -47,8 +48,10 @@ class Recognizer:
 
 
 
-
-    def getImagesAndLabels(self, path):
+    # Detects the cut faces of the pictures given and their labels.
+    # Detects at most one face per image, if there are multiple it chooses the one with the max confidence value.
+    # Returns the faces and their labels for training.
+    def get_images_and_labels(self, path):
         faceSamples=[]
         ids = []
         
@@ -64,19 +67,27 @@ class Recognizer:
             for imagePath in imagePaths:
                 PIL_img = Image.open(imagePath).convert('L') #Luminance  ==> greystyle
                 img_numpy = np.array(PIL_img,'uint8')
-                #print(PIL_img)
-                #.show()
-                #print(len(img_numpy)
+
                 id = n
-                faces = self.CC_classifier.detectMultiScale(img_numpy)
+                faces, confidences = self.CC_classifier.detectMultiScale2(img_numpy)
                 #print(id)
                 # print(faces)
                 if len(faces) > 1:
                     print("The following image detect more than 1 face", imagePath)
-                for (x,y,w,h) in faces:
-                    faceSamples.append(img_numpy[y:y+h,x:x+w])
-                    ids.append(id)
-                    #print(ids)
+                if len(faces) > 0:
+                    ind_max = np.argmax(confidences)
+
+                    face = faces[ind_max]
+                    confidence = confidences[ind_max]
+
+                    if(confidence >= self.training_CL):
+                        (x,y,w,h) = face
+                        # plt.imshow(img_numpy[y:y+h,x:x+w], interpolation='nearest')
+                        # plt.annotate(confidence,(0,0))
+                        # plt.show()
+                        faceSamples.append(img_numpy[y:y+h,x:x+w])
+                        ids.append(id)
+                        #print(ids)
                 
         return faceSamples,ids
 
