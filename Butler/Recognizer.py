@@ -31,9 +31,9 @@ class Recognizer:
         self.confidence_level = confidence_level
         self.training_CL = training_CL
 
-        self.faces, self.ids = self.getImagesAndLabels(self.path)
-        self.face_recognizer=cv2.face.LBPHFaceRecognizer_create()
-        self.face_recognizer.train(self.faces, np.array(self.ids))
+        self.faces, self.ids = self.get_images_and_labels(self.path)
+        # self.face_recognizer=cv2.face.LBPHFaceRecognizer_create()
+        # self.face_recognizer.train(self.faces, np.array(self.ids))
 
         # Save the model
         self.facerecognizer = self.train_classifier(self.faces, self.ids)
@@ -41,12 +41,6 @@ class Recognizer:
         
         # Get the video
         self.video_stream = cv2.VideoCapture(0)
-
-    def stop_recognizer(self):
-        self.video_stream.release()
-        cv2.destroyAllWindows()
-
-
 
     # Detects the cut faces of the pictures given and their labels.
     # Detects at most one face per image, if there are multiple it chooses the one with the max confidence value.
@@ -91,39 +85,6 @@ class Recognizer:
                 
         return faceSamples,ids
 
-    # Detects the faces from the camera.
-    # Returns the (x,y,w,h) of each face and the image from the camera
-    def detect_bounding_box(self,vid):
-        gray_image = cv2.cvtColor(vid, cv2.COLOR_BGR2GRAY)
-
-        faces = self.CC_classifier.detectMultiScale(gray_image, 1.1, 5, minSize=(40, 40))
-        return faces, gray_image
-
-    # Detects the faces from the camera.
-    # Returns the (x,y,w,h) of each face and the image
-    def train_classifier(self, faces, faceID):
-        face_recognizer=cv2.face.LBPHFaceRecognizer_create()
-        face_recognizer.train(faces, np.array(faceID))
-        return face_recognizer
-
-    # Returns the frame from the camera
-    def read_video_frame(self):
-        result, video_frame = self.video_stream.read()  # read frames from the video
-        if result is False:
-            return False, None  # Return false if the frame is not read successfully
-        return result, video_frame
-            
-    # From the face given, it tries to recognize a face from its training.
-    # Returns the name of the user and the confidence that it was predicted correctly
-    # The smaller the confidence, the biggest the probability. It works as a loss value.
-    def get_label_confidence(self, face, gray_image):
-        (x,y,w,h) = face
-        # print(x,y,w,h)
-        roi_gray = gray_image[y:y+h, x:x+h]
-        label, confidence = self.face_recognizer.predict(roi_gray)
-        return label, confidence
-
-
     def main(self):
 
         while True:
@@ -132,6 +93,10 @@ class Recognizer:
 
 
         self.stop_recognizer()
+
+    def stop_recognizer(self):
+        self.video_stream.release()
+        cv2.destroyAllWindows()
 
     def recognize_faces(self):
         video_frame, faces, gray_image = self.detect_faces()
@@ -142,17 +107,36 @@ class Recognizer:
             return False, None, None
         return detected_names, detected_names, None
 
+    def detect_faces(self):
+        result, video_frame = self.read_video_frame()  # read frames from the video
+
+        faces, gray_image = self.detect_bounding_box(video_frame)
+        return video_frame,faces,gray_image
 
     def show_bounded_faces(self, video_frame, faces, gray_image) -> list:
         detected_names = self.set_bounded_faces(video_frame, faces, gray_image)
         cv2.imshow("A Butler should know your face", video_frame)
         return detected_names
 
-    def detect_faces(self):
-        result, video_frame = self.read_video_frame()  # read frames from the video
+    # Returns the frame from the camera
+    def read_video_frame(self):
+        result, video_frame = self.video_stream.read()  # read frames from the video
+        if result is False:
+            return False, None  # Return false if the frame is not read successfully
+        return result, video_frame
 
-        faces, gray_image = self.detect_bounding_box(video_frame)
-        return video_frame,faces,gray_image
+    # Detects the faces from the camera.
+    # Returns the (x,y,w,h) of each face and the image from the camera
+    def detect_bounding_box(self,vid):
+        gray_image = cv2.cvtColor(vid, cv2.COLOR_BGR2GRAY)
+
+        faces = self.CC_classifier.detectMultiScale(gray_image, 1.1, 5, minSize=(40, 40))
+        return faces, gray_image
+
+    def train_classifier(self, faces, faceID):
+        face_recognizer=cv2.face.LBPHFaceRecognizer_create()
+        face_recognizer.train(faces, np.array(faceID))
+        return face_recognizer
 
     def set_bounded_faces(self, video_frame, faces, gray_image) -> list:
         detected_names = []
@@ -172,7 +156,15 @@ class Recognizer:
                 self.set_default_bounding_box(video_frame, face, predicted_name, confidence)
         return detected_names
 
-
+    # From the face given, it tries to recognize a face from its training.
+    # Returns the name of the user and the confidence that it was predicted correctly
+    # The smaller the confidence, the biggest the probability. It works as a loss value.
+    def get_label_confidence(self, face, gray_image):
+        (x,y,w,h) = face
+        # print(x,y,w,h)
+        roi_gray = gray_image[y:y+h, x:x+h]
+        label, confidence = self.face_recognizer.predict(roi_gray)
+        return label, confidence
 
     def set_bounding_box(self, vid, face, label: str, confidence: float):
         (x,y,w,h) = face
