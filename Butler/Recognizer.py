@@ -91,25 +91,31 @@ class Recognizer:
                 
         return faceSamples,ids
 
+    # Detects the faces from the camera.
+    # Returns the (x,y,w,h) of each face and the image from the camera
     def detect_bounding_box(self,vid):
         gray_image = cv2.cvtColor(vid, cv2.COLOR_BGR2GRAY)
 
         faces = self.CC_classifier.detectMultiScale(gray_image, 1.1, 5, minSize=(40, 40))
         return faces, gray_image
 
-
+    # Detects the faces from the camera.
+    # Returns the (x,y,w,h) of each face and the image
     def train_classifier(self, faces, faceID):
         face_recognizer=cv2.face.LBPHFaceRecognizer_create()
         face_recognizer.train(faces, np.array(faceID))
         return face_recognizer
 
+    # Returns the frame from the camera
     def read_video_frame(self):
         result, video_frame = self.video_stream.read()  # read frames from the video
         if result is False:
             return False, None  # Return false if the frame is not read successfully
         return result, video_frame
             
-
+    # From the face given, it tries to recognize a face from its training.
+    # Returns the name of the user and the confidence that it was predicted correctly
+    # The smaller the confidence, the biggest the probability. It works as a loss value.
     def get_label_confidence(self, face, gray_image):
         (x,y,w,h) = face
         # print(x,y,w,h)
@@ -160,15 +166,15 @@ class Recognizer:
             # gray = cv2.cvtColor(gray,cv2.COLOR_BGR2RGB)
 
             if(confidence <= self.confidence_level):
-                self.setBoundingBox(video_frame, face, predicted_name, confidence)
+                self.set_bounding_box(video_frame, face, predicted_name, confidence)
                 detected_names.append(predicted_name)
             else:
-                self.setDefaultBoundingBox(video_frame, face, predicted_name, confidence)
+                self.set_default_bounding_box(video_frame, face, predicted_name, confidence)
         return detected_names
 
 
 
-    def setBoundingBox(self, vid, face, label: str, confidence: float):
+    def set_bounding_box(self, vid, face, label: str, confidence: float):
         (x,y,w,h) = face
         point1 = (x, y)
         point2 = (x + w, y + h)
@@ -186,7 +192,7 @@ class Recognizer:
         # Add label to face
         cv2.putText(vid, text, (x, y - 5), font_face, scale, color, 1, cv2.LINE_AA)
 
-    def setDefaultBoundingBox(self, vid, face, label: str, confidence: float):
+    def set_default_bounding_box(self, vid, face, label: str, confidence: float):
         (x,y,w,h) = face
         point1 = (x, y)
         point2 = (x + w, y + h)
