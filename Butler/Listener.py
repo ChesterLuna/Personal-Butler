@@ -6,15 +6,31 @@ import speech_recognition as sr
 class Listener:
 
     def __init__(self):
-        l = sr.Recognizer()
-        mic = sr.Microphone() # Use default microphone
+        self.l = sr.Recognizer()
+        self.mic = sr.Microphone() # Use default microphone
 
         # calibrate
-        with mic as source:
-            l.adjust_for_ambient_noise(source)
+        with self.mic as source:
+            print("adjusting")
+            self.l.adjust_for_ambient_noise(source)
+
+    def listen_once(self):
+        timeout = 10
+        dialogue = None
+        print("listening")
+
+        with self.mic as source:
+            audio = self.l.listen(source,timeout)
+            dialogue = self.l.recognize_google_cloud(audio)
+
+        print(dialogue)
+    
 
 def main():
     ls = Listener()
+
+    print(ls.listen_once())
+
 
 if __name__ == "__main__":
     main()
