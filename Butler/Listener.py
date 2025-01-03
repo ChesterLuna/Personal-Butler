@@ -21,9 +21,9 @@ class Listener:
 
         with self.mic as source:
             audio = self.l.listen(source,timeout)
-            dialogue = self.l.recognize_google_cloud(audio)
+            dialogue = self.l.recognize_google(audio)
 
-        print(dialogue)
+        return(dialogue)
     
 
 def main():
