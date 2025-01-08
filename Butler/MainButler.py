@@ -1,5 +1,6 @@
 import Recognizer as rn
 import Speech
+import Listener
 
 def main():
     # Receive information from Recognizer
@@ -9,9 +10,12 @@ def main():
     faceFiles = None
     speaker = Speech.Speaker()
     recognizer = rn.Recognizer()
+    listener = Listener.Listener()
+
     while faceFiles is not False:
         facesFound = recognizer.recognize_faces()
         faceFiles, name, data = facesFound
+        listen = False
         
         if(faceFiles is False):
             break
@@ -20,6 +24,9 @@ def main():
             if(name[0] not in peopleGreeted):
                 speaker.greet(name[0])
                 peopleGreeted.append(name[0])
+        if(listen):
+            instruction = listener.listen_once()
+            print(instruction)
     recognizer.stop_recognizer
 
 
