@@ -201,6 +201,9 @@ class Recognizer:
 
         cv2.putText(vid, "Unknown user", (x, y - 5), font_face, scale, color, 1, cv2.LINE_AA)
 
+    def check_key(self, char):
+        return cv2.waitKey(1) & 0xFF == ord(char)
+
 
     # if __name__ == "__main__":
     #     main()

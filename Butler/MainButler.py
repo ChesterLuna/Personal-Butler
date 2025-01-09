@@ -24,7 +24,7 @@ def main():
             if(name[0] not in peopleGreeted):
                 speaker.greet(name[0])
                 peopleGreeted.append(name[0])
-        if(listen):
+        if(recognizer.check_key('c')):
             instruction = listener.listen_once()
             print(instruction)
     recognizer.stop_recognizer
