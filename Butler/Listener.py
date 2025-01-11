@@ -14,18 +14,8 @@ class Listener:
             print("adjusting")
             self.l.adjust_for_ambient_noise(source)
 
-    def listen_once(self):
-        timeout = None
-        dialogue = None
-        print("listening")
-
-        with self.mic as source:
-            audio = self.l.listen(source,timeout)
-            dialogue = self.l.recognize_google(audio)
-
-        return(dialogue)
     
-    def listen_once(self, timeout):
+    def listen_once(self, timeout = None):
         dialogue = None
         print("listening")
 

@@ -163,7 +163,7 @@ class Recognizer:
         (x,y,w,h) = face
         # print(x,y,w,h)
         roi_gray = gray_image[y:y+h, x:x+h]
-        label, confidence = self.face_recognizer.predict(roi_gray)
+        label, confidence = self.facerecognizer.predict(roi_gray)
         return label, confidence
 
     def set_bounding_box(self, vid, face, label: str, confidence: float):
