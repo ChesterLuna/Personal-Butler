@@ -103,7 +103,7 @@ class Recognizer:
 
         detected_names = self.show_bounded_faces(video_frame, faces, gray_image)
 
-        if cv2.waitKey(1) & 0xFF == ord("e"):
+        if self.check_key('e'):
             return False, None, None
         return detected_names, detected_names, None
 
