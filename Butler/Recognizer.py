@@ -103,7 +103,7 @@ class Recognizer:
 
         detected_names = self.show_bounded_faces(video_frame, faces, gray_image)
 
-        if cv2.waitKey(1) & 0xFF == ord("e"):
+        if self.check_key('e'):
             return False, None, None
         return detected_names, detected_names, None
 
@@ -163,7 +163,7 @@ class Recognizer:
         (x,y,w,h) = face
         # print(x,y,w,h)
         roi_gray = gray_image[y:y+h, x:x+h]
-        label, confidence = self.face_recognizer.predict(roi_gray)
+        label, confidence = self.facerecognizer.predict(roi_gray)
         return label, confidence
 
     def set_bounding_box(self, vid, face, label: str, confidence: float):
@@ -200,6 +200,9 @@ class Recognizer:
         cv2.rectangle(vid, point1, point2, color, thickness)
 
         cv2.putText(vid, "Unknown user", (x, y - 5), font_face, scale, color, 1, cv2.LINE_AA)
+
+    def check_key(self, char):
+        return cv2.waitKey(1) & 0xFF == ord(char)
 
 
     # if __name__ == "__main__":
